@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=erp_db
+      - POSTGRES_USER=erp_user
+      - POSTGRES_PASSWORD=erp_pass
+
+  redis:
+    image: redis:7-alpine
+
+  backend:
+    build: ./erp_backend
+    volumes:
+      - ./erp_backend:/app
+    environment:
+      - DATABASE_URL=postgres://erp_user:erp_pass@db:5432/erp_db
+      - REDIS_URL=redis://redis:6379/0
+      - DEBUG=True
+      - SECRET_KEY=dev-secret-key
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - redis
+
+  frontend:
+    build: ./erp_frontend
+    volumes:
+      - ./erp_frontend:/app
+    environment:
+      - VITE_API_URL=http://localhost:8000/api/v1
+    ports:
+      - "5173:5173"
+
+volumes:
+  postgres_data:

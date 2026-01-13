@@ -1,0 +1,12 @@
+django>=4.2,<5.0
+djangorestframework
+django-cors-headers
+django-filter
+djangorestframework-simplejwt
+psycopg2-binary
+python-dotenv
+celery
+redis
+drf-spectacular
+django-extensions
+pillow
