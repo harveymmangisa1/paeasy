@@ -7,6 +7,7 @@ from .models import Sale, Customer, POSDevice, Quotation, Invoice, CRMLog
 from .serializers import SaleSerializer, CustomerSerializer, QuotationSerializer, InvoiceSerializer, CRMLogSerializer
 from apps.inventory.models import Product, BranchStock
 from apps.users.models import User
+from apps.accounting.logic import post_sale_to_gl
 
 class CustomerViewSet(TenantAwareViewSet):
     queryset = Customer.objects.all()
@@ -107,6 +108,13 @@ def pos_create_sale(request):
                 stock.save()
             except BranchStock.DoesNotExist:
                 pass
+        
+        # Post to General Ledger
+        try:
+            post_sale_to_gl(sale)
+        except Exception as e:
+            # We log but don't fail the sale if GL posting fails
+            print(f"GL Posting failed: {str(e)}")
         
         return Response({
             'id': sale.id,

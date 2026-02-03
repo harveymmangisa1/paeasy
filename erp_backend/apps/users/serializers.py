@@ -54,8 +54,12 @@ class RegisterSerializer(serializers.Serializer):
         if attrs.get('password') != attrs.get('password_confirm'):
             raise serializers.ValidationError({"password": "Passwords do not match"})
         
-        # Check if email already exists
+        # Check if email already exists (username is set to email)
         if User.objects.filter(email=attrs['email']).exists():
+            raise serializers.ValidationError({"email": "User with this email already exists"})
+        
+        # Check if username (email) already exists
+        if User.objects.filter(username=attrs['email']).exists():
             raise serializers.ValidationError({"email": "User with this email already exists"})
         
         # Validate invitation token if provided

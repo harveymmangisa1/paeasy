@@ -53,6 +53,7 @@ class UserViewSet(viewsets.ModelViewSet):
             'user_id': str(user.id),
             'username': user.username,
             'role': user.role,
+            'tenant_id': str(user.tenant.id) if user.tenant else None,
             'permissions': matrix
         })
     

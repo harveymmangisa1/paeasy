@@ -1,5 +1,60 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import api from '../services/api';
+
+export const useInventory = () => {
+    const [items, setItems] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+    const fetchItems = useCallback(async () => {
+        setLoading(true);
+        try {
+            const response = await api.get('/inventory/items/');
+            setItems(response.data);
+            setError(null);
+        } catch (err) {
+            setError(err.response?.data?.detail || err.message || 'Failed to load inventory');
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        fetchItems();
+    }, [fetchItems]);
+
+    return { items, loading, error, refresh: fetchItems };
+};
+
+export const useInventoryActions = () => {
+    const createItem = useCallback(async (data) => {
+        try {
+            const response = await api.post('/inventory/items/', data);
+            return response.data;
+        } catch (err) {
+            throw err;
+        }
+    }, []);
+
+    const updateItem = useCallback(async (id, data) => {
+        try {
+            const response = await api.patch(`/inventory/items/${id}/`, data);
+            return response.data;
+        } catch (err) {
+            throw err;
+        }
+    }, []);
+
+    const deleteItem = useCallback(async (id) => {
+        try {
+            await api.delete(`/inventory/items/${id}/`);
+        } catch (err) {
+            throw err;
+        }
+    }, []);
+
+    return { createItem, updateItem, deleteItem };
+};
 
 export const useProducts = () => {
     const [products, setProducts] = useState([]);
@@ -60,30 +115,133 @@ export const useCustomers = () => {
         fetchCustomers();
     }, []);
 
-    return { customers, loading, error };
+    return { customers, loading, error, refresh: fetchCustomers };
+};
+
+export const useCustomerActions = () => {
+    const createCustomer = useCallback(async (data) => {
+        try {
+            const response = await api.post('/sales/customers/', data);
+            return response.data;
+        } catch (err) {
+            throw err;
+        }
+    }, []);
+
+    const updateCustomer = useCallback(async (id, data) => {
+        try {
+            const response = await api.patch(`/sales/customers/${id}/`, data);
+            return response.data;
+        } catch (err) {
+            throw err;
+        }
+    }, []);
+
+    const deleteCustomer = useCallback(async (id) => {
+        try {
+            await api.delete(`/sales/customers/${id}/`);
+        } catch (err) {
+            throw err;
+        }
+    }, []);
+
+    return { createCustomer, updateCustomer, deleteCustomer };
 };
 
 export const useEmployees = () => {
     const [employees, setEmployees] = useState([]);
+    const [departments, setDepartments] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [stats, setStats] = useState(null);
+
+    const fetchEmployees = async () => {
+        try {
+            const response = await api.get('/hr/employees/');
+            setEmployees(response.data);
+        } catch (err) {
+            setError(err.message);
+        }
+    };
+
+    const fetchDepartments = async () => {
+        try {
+            const response = await api.get('/hr/departments/');
+            setDepartments(response.data);
+        } catch (err) {
+            console.error('Failed to fetch departments:', err);
+        }
+    };
+
+    const fetchStats = async () => {
+        try {
+            const response = await api.get('/hr/stats/');
+            setStats(response.data);
+        } catch (err) {
+            console.error('Failed to fetch HR stats:', err);
+        }
+    };
 
     useEffect(() => {
-        const fetchEmployees = async () => {
+        const fetchData = async () => {
+            setLoading(true);
             try {
-                const response = await api.get('/hr/employees/');
-                setEmployees(response.data);
-                setLoading(false);
+                await Promise.all([
+                    fetchEmployees(),
+                    fetchDepartments(),
+                    fetchStats()
+                ]);
             } catch (err) {
                 setError(err.message);
+            } finally {
                 setLoading(false);
             }
         };
-
-        fetchEmployees();
+        fetchData();
     }, []);
 
-    return { employees, loading, error };
+    return {
+        employees,
+        departments,
+        loading,
+        error,
+        stats,
+        refresh: () => Promise.all([
+            fetchEmployees(),
+            fetchDepartments(),
+            fetchStats()
+        ])
+    };
+};
+
+export const useEmployeeActions = () => {
+    const createEmployee = useCallback(async (data) => {
+        try {
+            const response = await api.post('/hr/employees/', data);
+            return response.data;
+        } catch (err) {
+            throw err;
+        }
+    }, []);
+
+    const updateEmployee = useCallback(async (id, data) => {
+        try {
+            const response = await api.patch(`/hr/employees/${id}/`, data);
+            return response.data;
+        } catch (err) {
+            throw err;
+        }
+    }, []);
+
+    const deleteEmployee = useCallback(async (id) => {
+        try {
+            await api.delete(`/hr/employees/${id}/`);
+        } catch (err) {
+            throw err;
+        }
+    }, []);
+
+    return { createEmployee, updateEmployee, deleteEmployee };
 };
 
 export const useDashboardStats = (branchId = null) => {
@@ -91,23 +249,25 @@ export const useDashboardStats = (branchId = null) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    useEffect(() => {
-        const fetchStats = async () => {
-            try {
-                const params = branchId ? { branch_id: branchId } : {};
-                const response = await api.get('/analytics/dashboard/', { params });
-                setStats(response.data);
-                setLoading(false);
-            } catch (err) {
-                setError(err.message);
-                setLoading(false);
-            }
-        };
-
-        fetchStats();
+    const fetchStats = useCallback(async () => {
+        setLoading(true);
+        try {
+            const params = branchId ? { branch_id: branchId } : {};
+            const response = await api.get('/analytics/dashboard/', { params });
+            setStats(response.data);
+            setError(null);
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
     }, [branchId]);
 
-    return { stats, loading, error };
+    useEffect(() => {
+        fetchStats();
+    }, [fetchStats]);
+
+    return { stats, loading, error, refetch: fetchStats };
 };
 
 export const useQuotations = () => {
@@ -232,6 +392,180 @@ export const useLeaveRequests = (filters = {}) => {
 };
 
 export const useSales = () => {
+    const [sales, setSales] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [stats, setStats] = useState(null);
+
+    const fetchSales = async () => {
+        try {
+            const response = await api.get('/sales/sales/');
+            setSales(response.data);
+            setLoading(false);
+        } catch (err) {
+            setError(err.message);
+            setLoading(false);
+        }
+    };
+
+    const fetchStats = async () => {
+        try {
+            const response = await api.get('/sales/stats/');
+            setStats(response.data);
+        } catch (err) {
+            console.error('Failed to fetch sales stats:', err);
+        }
+    };
+
+    useEffect(() => {
+        fetchSales();
+        fetchStats();
+    }, []);
+
+    return { sales, loading, error, stats, refresh: fetchSales };
+};
+
+export const useSalesActions = () => {
+    const createSale = useCallback(async (data) => {
+        try {
+            const response = await api.post('/sales/sales/', data);
+            return response.data;
+        } catch (err) {
+            throw err;
+        }
+    }, []);
+
+    const updateSale = useCallback(async (id, data) => {
+        try {
+            const response = await api.patch(`/sales/sales/${id}/`, data);
+            return response.data;
+        } catch (err) {
+            throw err;
+        }
+    }, []);
+
+    const deleteSale = useCallback(async (id) => {
+        try {
+            await api.delete(`/sales/sales/${id}/`);
+        } catch (err) {
+            throw err;
+        }
+    }, []);
+
+    return { createSale, updateSale, deleteSale };
+};
+
+export const useAccounting = () => {
+    const [accounts, setAccounts] = useState([]);
+    const [journalEntries, setJournalEntries] = useState([]);
+    const [transactions, setTransactions] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [stats, setStats] = useState(null);
+
+    const fetchAccounts = async () => {
+        try {
+            const response = await api.get('/accounting/accounts/');
+            setAccounts(response.data);
+        } catch (err) {
+            setError(err.message);
+        }
+    };
+
+    const fetchJournalEntries = async () => {
+        try {
+            const response = await api.get('/accounting/journal-entries/');
+            setJournalEntries(response.data);
+        } catch (err) {
+            setError(err.message);
+        }
+    };
+
+    const fetchTransactions = async () => {
+        try {
+            const response = await api.get('/accounting/transactions/');
+            setTransactions(response.data);
+        } catch (err) {
+            setError(err.message);
+        }
+    };
+
+    const fetchStats = async () => {
+        try {
+            const response = await api.get('/accounting/stats/');
+            setStats(response.data);
+        } catch (err) {
+            console.error('Failed to fetch accounting stats:', err);
+        }
+    };
+
+    useEffect(() => {
+        const fetchData = async () => {
+            setLoading(true);
+            try {
+                await Promise.all([
+                    fetchAccounts(),
+                    fetchJournalEntries(),
+                    fetchTransactions(),
+                    fetchStats()
+                ]);
+            } catch (err) {
+                setError(err.message);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchData();
+    }, []);
+
+    return {
+        accounts,
+        journalEntries,
+        transactions,
+        loading,
+        error,
+        stats,
+        refresh: () => Promise.all([
+            fetchAccounts(),
+            fetchJournalEntries(),
+            fetchTransactions(),
+            fetchStats()
+        ])
+    };
+};
+
+export const useAccountingActions = () => {
+    const createAccount = useCallback(async (data) => {
+        try {
+            const response = await api.post('/accounting/accounts/', data);
+            return response.data;
+        } catch (err) {
+            throw err;
+        }
+    }, []);
+
+    const createJournalEntry = useCallback(async (data) => {
+        try {
+            const response = await api.post('/accounting/journal-entries/', data);
+            return response.data;
+        } catch (err) {
+            throw err;
+        }
+    }, []);
+
+    const createTransaction = useCallback(async (data) => {
+        try {
+            const response = await api.post('/accounting/transactions/', data);
+            return response.data;
+        } catch (err) {
+            throw err;
+        }
+    }, []);
+
+    return { createAccount, createJournalEntry, createTransaction };
+};
+
+export const usePOS = () => {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);

@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { ShoppingCart, CreditCard, Utensils, Scissors, Package, Trash2, Plus, Minus, Search, X } from 'lucide-react';
-import { useSales } from '../../hooks/useApi';
+import { usePOS } from '../../hooks/useApi';
 import { useAuth } from '../../context/AuthContext';
 
 const Sales = ({ industry = 'retail' }) => {
     const { user } = useAuth();
-    const { products, loading, error, fetchPOSProducts, createSale } = useSales();
+    const { products, loading, error, fetchPOSProducts, createSale } = usePOS();
     const [cart, setCart] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [processing, setProcessing] = useState(false);

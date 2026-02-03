@@ -51,6 +51,10 @@ export const AuthProvider = ({ children }) => {
             setUser(profileResponse.data);
             setIsAuthenticated(true);
 
+            if (profileResponse.data.tenant_id) {
+                localStorage.setItem('tenantId', profileResponse.data.tenant_id);
+            }
+
             // If the user belongs to a tenant, we might want to store tenant ID if the API requires it separately
             // But api.js interceptor uses localStorage.getItem('tenantId') which we might not have yet?
             // The User model has 'tenant' field.

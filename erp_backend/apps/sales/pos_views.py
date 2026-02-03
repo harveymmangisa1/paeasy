@@ -5,6 +5,7 @@ from rest_framework.permissions import AllowAny
 from .models import POSDevice, Sale, SaleItem
 from apps.inventory.models import BranchStock
 from django.db import transaction
+from apps.accounting.logic import post_sale_to_gl
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
@@ -69,5 +70,11 @@ def sync_sales(request):
                 stock = BranchStock.objects.get(branch_id=sale_dt['branch_id'], product_id=item_dt['product_id'])
                 stock.quantity -= item_dt['quantity']
                 stock.save()
+            
+            # Post to General Ledger
+            try:
+                post_sale_to_gl(sale)
+            except Exception as e:
+                print(f"GL Posting failed for synced sale: {str(e)}")
                 
     return Response({'status': 'sync_completed'})

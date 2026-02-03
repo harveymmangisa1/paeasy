@@ -10,3 +10,4 @@ redis
 drf-spectacular
 django-extensions
 pillow
+ 

@@ -4,9 +4,13 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import Sidebar from './components/layout/Sidebar';
 import Dashboard from './modules/dashboard/Dashboard';
 import Inventory from './modules/inventory/Inventory';
+import InventoryManagement from './modules/inventory/InventoryManagement';
 import Sales from './modules/sales/Sales';
+import SalesManagement from './modules/sales/SalesManagement';
 import Accounting from './modules/accounting/Accounting';
+import AccountingManagement from './modules/accounting/AccountingManagement';
 import HR from './modules/hr/HR';
+import HRManagement from './modules/hr/HRManagement';
 import CRM from './modules/crm/CRM';
 import UserManagement from './modules/users/UserManagement';
 import Login from './modules/auth/Login';
@@ -31,13 +35,13 @@ const ProtectedRoute = () => {
 
 // Dashboard Layout (Sidebar + Content)
 const DashboardLayout = () => {
-    // Demo: Switch industry here to see adaptation
-    const demoIndustry = 'pharmacy'; // Try: 'retail', 'pharmacy', 'service', 'restaurant'
+    const demoIndustry = 'pharmacy';
 
     return (
         <div className="flex min-h-screen">
-            <Sidebar industry={demoIndustry} />
-            <main className="flex-1 ml-64 p-8 bg-slate-50 min-h-screen">
+            <Sidebar />
+            {/* marginLeft: 76 * 0.25rem = 19rem (304px) */}
+            <main className="flex-1 p-8 bg-slate-50 min-h-screen" style={{ marginLeft: '19rem' }}>
                 <Outlet />
             </main>
         </div>
@@ -61,9 +65,13 @@ const App = () => {
                         <Route element={<DashboardLayout />}>
                             <Route path="/dashboard" element={<Dashboard industry={demoIndustry} />} />
                             <Route path="/inventory" element={<Inventory industry={demoIndustry} />} />
+                            <Route path="/inventory-management" element={<InventoryManagement industry={demoIndustry} />} />
                             <Route path="/sales" element={<Sales industry={demoIndustry} />} />
+                            <Route path="/sales-management" element={<SalesManagement industry={demoIndustry} />} />
                             <Route path="/accounting" element={<Accounting industry={demoIndustry} />} />
+                            <Route path="/accounting-management" element={<AccountingManagement industry={demoIndustry} />} />
                             <Route path="/hr" element={<HR industry={demoIndustry} />} />
+                            <Route path="/hr-management" element={<HRManagement industry={demoIndustry} />} />
                             <Route path="/crm" element={<CRM industry={demoIndustry} />} />
                             <Route path="/users" element={<UserManagement />} />
                             <Route path="/pos" element={<div>POS Integration Content</div>} />
