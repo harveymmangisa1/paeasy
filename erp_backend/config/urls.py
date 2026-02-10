@@ -19,6 +19,7 @@ urlpatterns = [
     path('api/v1/sales/', include('apps.sales.urls')),
     path('api/v1/accounting/', include('apps.accounting.urls')),
     path('api/v1/hr/', include('apps.hr.urls')),
+    path('api/v1/crm/', include('apps.crm.urls')),
     path('api/v1/analytics/', include('apps.analytics.urls')),
     
     # OpenAPI Schema

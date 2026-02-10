@@ -96,3 +96,40 @@ class JournalEntryViewSet(TenantAwareViewSet):
 class BillViewSet(TenantAwareViewSet):
     queryset = Bill.objects.all()
     serializer_class = BillSerializer
+
+class TransactionViewSet(TenantAwareViewSet):
+    """
+    Lightweight transactions view backed by LedgerLine for UI compatibility.
+    """
+    queryset = LedgerLine.objects.all()
+    serializer_class = LedgerLineSerializer
+
+class AccountingStatsViewSet(TenantAwareViewSet):
+    """
+    Simple stats endpoint placeholder for dashboards.
+    """
+    queryset = Account.objects.all()
+    serializer_class = AccountSerializer
+
+    @action(detail=False, methods=['get'])
+    def summary(self, request):
+        accounts = Account.objects.filter(tenant=request.tenant_id)
+        totals = {
+            'total_assets': 0,
+            'total_liabilities': 0,
+            'monthly_revenue': 0,
+            'monthly_expenses': 0,
+        }
+        for acc in accounts:
+            debits = LedgerLine.objects.filter(account=acc).aggregate(Sum('debit'))['debit__sum'] or 0
+            credits = LedgerLine.objects.filter(account=acc).aggregate(Sum('credit'))['credit__sum'] or 0
+            balance = debits - credits
+            if acc.account_type == 'asset':
+                totals['total_assets'] += balance
+            if acc.account_type == 'liability':
+                totals['total_liabilities'] += balance
+            if acc.account_type == 'revenue':
+                totals['monthly_revenue'] += credits - debits
+            if acc.account_type == 'expense':
+                totals['monthly_expenses'] += debits - credits
+        return Response(totals)

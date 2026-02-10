@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import api from '@/services/api';
+import { useAuth } from '@/context/AuthContext';
 import { Store, Check, Loader2, ChevronRight, Building2, Mail, Lock, LayoutGrid, ArrowLeft } from 'lucide-react';
 
 const Onboarding = () => {
     const navigate = useNavigate();
+    const { registerTenant } = useAuth();
     const [step, setStep] = useState(1);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -69,7 +71,7 @@ const Onboarding = () => {
         setLoading(true);
 
         try {
-            const response = await api.post('/tenants/onboard/', {
+            const payload = {
                 company_name: formData.company_name,
                 industry: formData.industry,
                 admin_email: formData.admin_email,
@@ -77,10 +79,28 @@ const Onboarding = () => {
                 selected_modules: formData.selected_modules,
                 subscription_tier: formData.subscription_tier,
                 enable_multi_site: formData.enable_multi_site
-            });
+            };
+
+            if (registerTenant) {
+                const result = await registerTenant(payload);
+                if (result.success) {
+                    navigate('/dashboard');
+                    return;
+                }
+            }
+
+            const response = await api.post('/tenants/onboard/', payload);
 
             if (response.data.success) {
-                // Redirect to login with success message ideally
+                const activeModules = response.data.active_modules || {};
+                const selectedModules = Object.keys(activeModules).filter((key) => activeModules[key]);
+                localStorage.setItem('tenant_profile', JSON.stringify({
+                    tenant_id: response.data.tenant_id,
+                    company_name: response.data.tenant_name,
+                    selected_modules: selectedModules,
+                    subscription_tier: payload.subscription_tier,
+                    enable_multi_site: payload.enable_multi_site,
+                }));
                 navigate('/login');
             }
         } catch (err) {
@@ -248,6 +268,34 @@ const Onboarding = () => {
                                 <div className="text-center mb-8">
                                     <h2 className="text-3xl font-bold text-slate-900">Select Modules</h2>
                                     <p className="text-slate-500 mt-2">Choose what you need. You can change this later.</p>
+                                </div>
+
+                                <div className="space-y-3">
+                                    <h3 className="text-sm font-semibold text-slate-700">Choose a plan</h3>
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                        {[
+                                            { id: 'free', name: 'Free', desc: 'Limited modules + basic reports', badge: 'Starter' },
+                                            { id: 'standard', name: 'Standard', desc: 'Core modules with VAT/WHT', badge: 'Growth' },
+                                            { id: 'pro', name: 'Pro', desc: 'All modules + automation', badge: 'Scale' },
+                                        ].map((tier) => (
+                                            <button
+                                                key={tier.id}
+                                                type="button"
+                                                onClick={() => setFormData({ ...formData, subscription_tier: tier.id })}
+                                                className={`p-4 rounded-xl border text-left transition-all ${
+                                                    formData.subscription_tier === tier.id
+                                                        ? 'border-blue-600 bg-blue-50'
+                                                        : 'border-slate-200 hover:border-slate-300'
+                                                }`}
+                                            >
+                                                <div className="flex items-center justify-between">
+                                                    <h4 className="font-bold text-slate-900">{tier.name}</h4>
+                                                    <span className="text-xs text-slate-500">{tier.badge}</span>
+                                                </div>
+                                                <p className="text-xs text-slate-500 mt-2">{tier.desc}</p>
+                                            </button>
+                                        ))}
+                                    </div>
                                 </div>
 
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[300px] overflow-y-auto p-1">

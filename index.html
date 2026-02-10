@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Manager - Productivity Suite</title>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/components.css">
+    <link rel="stylesheet" href="styles/themes.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div id="app" class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-left">
+                <button id="sidebar-toggle" class="btn btn-icon">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1 class="app-title">Task Manager</h1>
+            </div>
+            <div class="header-center">
+                <div class="search-container">
+                    <input type="text" id="search-input" placeholder="Search tasks..." class="search-input">
+                    <i class="fas fa-search search-icon"></i>
+                </div>
+            </div>
+            <div class="header-right">
+                <button id="view-toggle" class="btn btn-icon" title="Toggle view">
+                    <i class="fas fa-th-large"></i>
+                </button>
+                <button id="theme-toggle" class="btn btn-icon" title="Toggle theme">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <button id="user-menu" class="btn btn-icon" title="User menu">
+                    <i class="fas fa-user"></i>
+                </button>
+            </div>
+        </header>
+
+        <div class="app-body">
+            <!-- Sidebar -->
+            <aside id="sidebar" class="sidebar">
+                <nav class="sidebar-nav">
+                    <ul class="nav-list">
+                        <li class="nav-item active">
+                            <a href="#" data-view="all" class="nav-link">
+                                <i class="fas fa-inbox"></i>
+                                <span>All Tasks</span>
+                                <span class="task-count" id="all-count">0</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" data-view="today" class="nav-link">
+                                <i class="fas fa-calendar-day"></i>
+                                <span>Today</span>
+                                <span class="task-count" id="today-count">0</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" data-view="upcoming" class="nav-link">
+                                <i class="fas fa-calendar-week"></i>
+                                <span>Upcoming</span>
+                                <span class="task-count" id="upcoming-count">0</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#" data-view="completed" class="nav-link">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Completed</span>
+                                <span class="task-count" id="completed-count">0</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+
+                <div class="sidebar-section">
+                    <h3 class="section-title">Projects</h3>
+                    <ul class="project-list" id="project-list">
+                        <li class="project-item">
+                            <a href="#" data-project="personal" class="project-link">
+                                <span class="project-color" style="background: #3b82f6;"></span>
+                                <span>Personal</span>
+                            </a>
+                        </li>
+                        <li class="project-item">
+                            <a href="#" data-project="work" class="project-link">
+                                <span class="project-color" style="background: #10b981;"></span>
+                                <span>Work</span>
+                            </a>
+                        </li>
+                    </ul>
+                    <button id="add-project" class="btn btn-text btn-sm">
+                        <i class="fas fa-plus"></i> Add Project
+                    </button>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3 class="section-title">Labels</h3>
+                    <ul class="label-list" id="label-list">
+                        <li class="label-item">
+                            <a href="#" data-label="urgent" class="label-link">
+                                <span class="label-color" style="background: #ef4444;"></span>
+                                <span>Urgent</span>
+                            </a>
+                        </li>
+                        <li class="label-item">
+                            <a href="#" data-label="important" class="label-link">
+                                <span class="label-color" style="background: #f59e0b;"></span>
+                                <span>Important</span>
+                            </a>
+                        </li>
+                    </ul>
+                    <button id="add-label" class="btn btn-text btn-sm">
+                        <i class="fas fa-plus"></i> Add Label
+                    </button>
+                </div>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="main-content">
+                <div class="content-header">
+                    <div class="content-left">
+                        <h2 class="page-title" id="page-title">All Tasks</h2>
+                        <p class="task-stats" id="task-stats">0 tasks</p>
+                    </div>
+                    <div class="content-right">
+                        <div class="view-options">
+                            <button class="btn btn-icon view-btn active" data-view="list" title="List view">
+                                <i class="fas fa-list"></i>
+                            </button>
+                            <button class="btn btn-icon view-btn" data-view="board" title="Board view">
+                                <i class="fas fa-columns"></i>
+                            </button>
+                            <button class="btn btn-icon view-btn" data-view="calendar" title="Calendar view">
+                                <i class="fas fa-calendar"></i>
+                            </button>
+                        </div>
+                        <button id="add-task-btn" class="btn btn-primary">
+                            <i class="fas fa-plus"></i> Add Task
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Filters -->
+                <div class="filters-bar">
+                    <div class="filter-group">
+                        <select id="status-filter" class="filter-select">
+                            <option value="">All Status</option>
+                            <option value="todo">To Do</option>
+                            <option value="in-progress">In Progress</option>
+                            <option value="completed">Completed</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <select id="priority-filter" class="filter-select">
+                            <option value="">All Priority</option>
+                            <option value="low">Low</option>
+                            <option value="medium">Medium</option>
+                            <option value="high">High</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <select id="sort-filter" class="filter-select">
+                            <option value="created">Sort by Created</option>
+                            <option value="due-date">Sort by Due Date</option>
+                            <option value="priority">Sort by Priority</option>
+                            <option value="name">Sort by Name</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Task Container -->
+                <div class="task-container" id="task-container">
+                    <div class="empty-state" id="empty-state">
+                        <i class="fas fa-tasks empty-icon"></i>
+                        <h3>No tasks yet</h3>
+                        <p>Create your first task to get started</p>
+                        <button class="btn btn-primary" onclick="document.getElementById('add-task-btn').click()">
+                            <i class="fas fa-plus"></i> Create Task
+                        </button>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div id="modal-overlay" class="modal-overlay hidden">
+        <!-- Task Modal -->
+        <div id="task-modal" class="modal hidden">
+            <div class="modal-header">
+                <h3 class="modal-title" id="task-modal-title">Add New Task</h3>
+                <button class="btn btn-icon modal-close" data-modal="task-modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="task-form">
+                    <div class="form-group">
+                        <label for="task-title">Title *</label>
+                        <input type="text" id="task-title" name="title" required class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label for="task-description">Description</label>
+                        <textarea id="task-description" name="description" rows="3" class="form-textarea"></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="task-project">Project</label>
+                            <select id="task-project" name="project" class="form-select">
+                                <option value="">No Project</option>
+                                <option value="personal">Personal</option>
+                                <option value="work">Work</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="task-status">Status</label>
+                            <select id="task-status" name="status" class="form-select">
+                                <option value="todo">To Do</option>
+                                <option value="in-progress">In Progress</option>
+                                <option value="completed">Completed</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="task-priority">Priority</label>
+                            <select id="task-priority" name="priority" class="form-select">
+                                <option value="low">Low</option>
+                                <option value="medium">Medium</option>
+                                <option value="high">High</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="task-due-date">Due Date</label>
+                            <input type="date" id="task-due-date" name="dueDate" class="form-input">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Labels</label>
+                        <div class="label-options">
+                            <label class="label-option">
+                                <input type="checkbox" name="labels" value="urgent">
+                                <span class="label-chip urgent">Urgent</span>
+                            </label>
+                            <label class="label-option">
+                                <input type="checkbox" name="labels" value="important">
+                                <span class="label-chip important">Important</span>
+                            </label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary modal-close" data-modal="task-modal">Cancel</button>
+                <button type="submit" form="task-form" class="btn btn-primary">Save Task</button>
+            </div>
+        </div>
+
+        <!-- Project Modal -->
+        <div id="project-modal" class="modal hidden">
+            <div class="modal-header">
+                <h3 class="modal-title">Add New Project</h3>
+                <button class="btn btn-icon modal-close" data-modal="project-modal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="project-form">
+                    <div class="form-group">
+                        <label for="project-name">Project Name *</label>
+                        <input type="text" id="project-name" name="name" required class="form-input">
+                    </div>
+                    <div class="form-group">
+                        <label for="project-color">Color</label>
+                        <div class="color-picker">
+                            <input type="color" id="project-color" name="color" value="#3b82f6" class="color-input">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary modal-close" data-modal="project-modal">Cancel</button>
+                <button type="submit" form="project-form" class="btn btn-primary">Create Project</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script src="js/task-manager.js"></script>
+    <script src="js/ui-controller.js"></script>
+    <script src="js/storage.js"></script>
+</body>
+</html>

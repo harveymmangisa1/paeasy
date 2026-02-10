@@ -69,7 +69,8 @@ const Sidebar = () => {
             { name: 'Attendance', path: '/attendance', icon: <Calendar size={18} /> },
         ],
         crm: [
-            { name: 'Lead Tracker', path: '/crm', icon: <User size={18} /> },
+            { name: 'Dashboard', path: '/crm', icon: <PieChart size={18} /> },
+            { name: 'CRM Management', path: '/crm-management', icon: <Briefcase size={18} /> },
             { name: 'Activity Log', path: '/logs', icon: <FileText size={18} /> },
         ],
         admin: [

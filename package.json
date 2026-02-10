@@ -1,0 +1,17 @@
+{
+  "name": "task-manager",
+  "version": "1.0.0",
+  "description": "A full-featured task manager similar to Notion/ClickUp",
+  "main": "index.html",
+  "scripts": {
+    "dev": "live-server --port=3000 --open=/index.html",
+    "build": "echo 'Build complete - static files ready'",
+    "start": "live-server --port=3000 --open=/index.html"
+  },
+  "keywords": ["task-manager", "productivity", "notion", "clickup"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "live-server": "^1.2.2"
+  }
+}

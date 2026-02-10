@@ -475,40 +475,60 @@ const LandingPage = () => {
                         <p className="text-slate-400 max-w-xl mx-auto italic">"The last business platform you'll ever need to migrate to."</p>
                     </div>
 
-                    <div className="grid lg:grid-cols-3 gap-8 items-center max-w-6xl mx-auto">
-                        {/* Startup Package */}
-                        <div className="p-8 rounded-[2rem] bg-slate-800/50 border border-slate-700 hover:border-indigo-500/50 transition-all group">
-                            <Rocket className="w-10 h-10 text-indigo-400 mb-6" />
-                            <h4 className="text-2xl font-bold mb-2">Startup Essentials</h4>
+                    <div className="grid lg:grid-cols-4 gap-6 items-center max-w-6xl mx-auto">
+                        {/* Free Package */}
+                        <div className="p-7 rounded-[2rem] bg-slate-800/50 border border-slate-700 hover:border-indigo-500/50 transition-all group">
+                            <Sparkles className="w-10 h-10 text-indigo-300 mb-6" />
+                            <h4 className="text-2xl font-bold mb-2">Free</h4>
                             <div className="flex items-baseline mb-6">
-                                <span className="text-4xl font-black">$49</span>
+                                <span className="text-4xl font-black">$0</span>
                                 <span className="text-slate-400 ml-2">/mo</span>
                             </div>
-                            <ul className="space-y-4 mb-10">
-                                {['Core Accounting', 'Basic Inventory', '5 User Seats', 'Email Support'].map(item => (
+                            <ul className="space-y-3 mb-10">
+                                {['Accounting Lite', 'HR Payroll Summary', '2 User Seats', 'Community Support'].map(item => (
+                                    <li key={item} className="flex items-center text-slate-300 text-sm">
+                                        <Check className="w-4 h-4 text-indigo-300 mr-3" /> {item}
+                                    </li>
+                                ))}
+                            </ul>
+                            <button className="w-full py-3 bg-white text-slate-900 rounded-2xl font-bold hover:bg-indigo-400 hover:text-white transition-all">
+                                Start Free
+                            </button>
+                        </div>
+
+                        {/* Standard Package */}
+                        <div className="p-7 rounded-[2rem] bg-slate-800/50 border border-slate-700 hover:border-indigo-500/50 transition-all group">
+                            <Rocket className="w-10 h-10 text-indigo-400 mb-6" />
+                            <h4 className="text-2xl font-bold mb-2">Standard</h4>
+                            <div className="flex items-baseline mb-6">
+                                <span className="text-4xl font-black">$79</span>
+                                <span className="text-slate-400 ml-2">/mo</span>
+                            </div>
+                            <ul className="space-y-3 mb-10">
+                                {['Core Accounting', 'Inventory + Sales', 'VAT/WHT', 'Email Support'].map(item => (
                                     <li key={item} className="flex items-center text-slate-300 text-sm">
                                         <Check className="w-4 h-4 text-indigo-400 mr-3" /> {item}
                                     </li>
                                 ))}
                             </ul>
-                            <button className="w-full py-4 bg-white text-slate-900 rounded-2xl font-bold hover:bg-indigo-400 hover:text-white transition-all">
-                                Get Started
+                            <button className="w-full py-3 bg-white text-slate-900 rounded-2xl font-bold hover:bg-indigo-400 hover:text-white transition-all">
+                                Choose Standard
                             </button>
                         </div>
 
                         {/* SME Package - Highlighted */}
-                        <div className="p-10 rounded-[2rem] bg-indigo-600 border border-indigo-400 shadow-2xl shadow-indigo-500/20 scale-105 relative">
+                        <div className="p-9 rounded-[2rem] bg-indigo-600 border border-indigo-400 shadow-2xl shadow-indigo-500/20 relative">
                             <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-white text-indigo-600 px-4 py-1 rounded-full text-xs font-black uppercase tracking-widest shadow-xl">
                                 Recommended
                             </div>
                             <Briefcase className="w-10 h-10 text-white mb-6" />
-                            <h4 className="text-2xl font-bold mb-2">SME Business Suite</h4>
+                            <h4 className="text-2xl font-bold mb-2">Pro Suite</h4>
                             <div className="flex items-baseline mb-6">
                                 <span className="text-4xl font-black">$199</span>
                                 <span className="text-indigo-200 ml-2">/mo</span>
                             </div>
                             <ul className="space-y-4 mb-10 text-indigo-50">
-                                {['Complete Accounting', 'Advanced Inventory', 'Full HR Suite', 'Sales & CRM', 'Priority Support', 'API Access'].map(item => (
+                                {['Full Accounting', 'Inventory + CRM', 'HR + Payroll', 'POS Integration', 'Priority Support', 'API Access'].map(item => (
                                     <li key={item} className="flex items-center text-sm">
                                         <Check className="w-4 h-4 text-indigo-200 mr-3" /> {item}
                                     </li>
@@ -520,7 +540,7 @@ const LandingPage = () => {
                         </div>
 
                         {/* Enterprise Package */}
-                        <div className="p-8 rounded-[2rem] bg-slate-800/50 border border-slate-700 hover:border-indigo-500/50 transition-all">
+                        <div className="p-7 rounded-[2rem] bg-slate-800/50 border border-slate-700 hover:border-indigo-500/50 transition-all">
                             <Building2 className="w-10 h-10 text-indigo-400 mb-6" />
                             <h4 className="text-2xl font-bold mb-2">Enterprise</h4>
                             <div className="text-4xl font-black mb-6">Custom</div>

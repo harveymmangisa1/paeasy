@@ -2,6 +2,7 @@
   "name": "erp_frontend",
   "version": "1.0.0",
   "description": "",
+  "type": "module",
   "main": "tailwind.config.js",
   "scripts": {
     "dev": "vite",
